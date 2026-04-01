@@ -110,44 +110,58 @@
     </div>
 
     <script>
-        async function prosesLogin() {
-            const nisn = document.getElementById('input-nisn').value.trim();
-            const pesan = document.getElementById('pesan');
-            const btn = document.getElementById('btn-text');
+      async function prosesLogin() {
+        const nisnInput = document.getElementById('input-nisn').value.trim();
+        const pesan = document.getElementById('pesan'); // Ini variabelnya
+        const btn = document.getElementById('btn-text');
 
-            // --- MASUKKAN LINK GOOGLE APPS SCRIPT ANDA DI SINI ---
-            const url = "https://script.google.com/macros/s/AKfycbwLBGoBQwx3MUQxaeiUzsxcWsdRi3E8fDexiplHbN4oHud7hHowWWTecbNBVZlTYgzNxg/exec";
+        const url = "https://script.google.com/macros/s/AKfycbwLBGoBQwx3MUQxaeiUzsxcWsdRi3E8fDexiplHbN4oHud7hHowWWTecbNBVZlTYgzNxg/exec";
 
-            if(!nisn) { alert("Masukkan NISN!"); return; }
-            pesan.innerText = "Mencari data...";
-            pesan.classList.remove('hidden');
+        if(!nisnInput) { alert("Masukkan NISN!"); return; }
 
-            try {
-                const res = await fetch(url);
-                const data = await res.json();
-                const s = data.find(item => String(item.nisn).trim() === nisn);
+        // Tampilkan pesan loading
+        pesan.innerText = "Sabar, sedang mencari data...";
+        pesan.style.display = "block";
+        btn.innerText = "Mencari...";
+        btn.disabled = true;
 
-                if(s) {
-                    document.getElementById('v-nama').innerText = s.nama_siswa;
-                    document.getElementById('p-nama').innerText = s.nama_siswa;
-                    document.getElementById('p-nisn').innerText = s.nisn;
-                    document.getElementById('p-agama').innerText = s.n_agama_bp || "-";
-                    document.getElementById('p-pancasila').innerText = s.n_pendidikan_pancasila || "-";
-                    document.getElementById('p-indo').innerText = s.n_bahasa_indonesia || "-";
-                    document.getElementById('p-rata').innerText = s.n_rerata_akhir || "-";
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+            
+            // Mencocokkan NISN
+            const s = data.find(item => String(item.nisn).trim() === nisnInput);
 
-                    document.getElementById('login-box').style.display = "none";
-                    document.getElementById('result-box').style.display = "block";
-                } else {
-                    err.innerText = "NISN tidak ditemukan!";
-                    err.style.display = "block";
-                    btn.innerText = "CEK KELULUSAN SAYA";
-                }
-            } catch (e) {
-                alert("Koneksi gagal!");
+            if(s) {
+                // Isi data ke layar hasil
+                document.getElementById('v-nama').innerText = s.nama_siswa;
+                document.getElementById('v-nisn').innerText = s.nisn;
+                
+                // Isi data ke area cetak (SKL)
+                document.getElementById('p-nama').innerText = s.nama_siswa;
+                document.getElementById('p-nisn').innerText = s.nisn;
+                document.getElementById('p-agama').innerText = s.n_agama_bp || "-";
+                document.getElementById('p-pancasila').innerText = s.n_pendidikan_pancasila || "-";
+                document.getElementById('p-indo').innerText = s.n_bahasa_indonesia || "-";
+                document.getElementById('p-rata').innerText = s.n_rerata_akhir || "-";
+
+                // Pindah Layar (Gunakan ID yang sesuai dengan HTML Anda)
+                document.getElementById('screen-login').style.display = "none";
+                document.getElementById('screen-result').style.display = "block";
+            } else {
+                // Perbaikan di sini: gunakan 'pesan', bukan 'err'
+                pesan.innerText = "Maaf, NISN " + nisnInput + " tidak ditemukan!";
+                pesan.style.color = "red";
                 btn.innerText = "CEK KELULUSAN SAYA";
+                btn.disabled = false;
             }
+        } catch (e) {
+            alert("Gagal mengambil data. Pastikan internet stabil!");
+            btn.innerText = "CEK KELULUSAN SAYA";
+            btn.disabled = false;
         }
-    </script>
+    }
+</script>
+
 </body>
 </html>
