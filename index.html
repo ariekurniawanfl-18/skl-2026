@@ -127,55 +127,61 @@
     </div>
 
     <script>
-        async function prosesLogin() {
-            const nisnInput = document.getElementById('input-nisn').value.trim();
-            const pesan = document.getElementById('pesan-status');
-            const btn = document.getElementById('btn-text');
-            // LINK GOOGLE APPS SCRIPT ANDA
-            const url = "https://script.google.com/macros/s/AKfycbzFcCpr_f4Lu6eWgwt3I6Wf59e4iug8sX31G3pnflwjJUMuxff2Tlx94meDAY41ZR_gTA/exec";
+    async function prosesLogin() {
+        const nisnInput = document.getElementById('input-nisn').value.trim();
+        const pesan = document.getElementById('pesan-status');
+        const btn = document.getElementById('btn-text');
+        
+        // Link yang sudah terbukti berhasil di gambar Anda
+        const url = "https://script.google.com/macros/s/AKfycbzFcCpr_f4Lu6eWgwt3I6Wf59e4iug8sX31G3pnflwjJUMuxff2Tlx94meDAY41ZR_gTA/exec";
 
-            if(!nisnInput) { alert("Masukkan NISN!"); return; }
+        if(!nisnInput) { alert("Masukkan NISN!"); return; }
 
-            pesan.innerText = "Sabar, sedang mencari data...";
-            pesan.style.display = "block";
-            pesan.style.color = "gray";
-            btn.innerText = "Mencari...";
-            btn.disabled = true;
+        pesan.innerText = "Sabar, sedang mencari data siswa...";
+        pesan.style.display = "block";
+        pesan.style.color = "gray";
+        btn.innerText = "Mencari...";
+        btn.disabled = true;
 
-            try {
-                const res = await fetch(url);
-                const data = await res.json();
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+            
+            // Mencocokkan NISN dari data yang ada di gambar Anda
+            const s = data.find(item => String(item.nisn).trim() === nisnInput);
+
+            if(s) {
+                // 1. Isi data ke tampilan layar (v-nama, dll)
+                document.getElementById('v-nama').innerText = s.nama_siswa;
                 
-                // Pastikan nama kolom di Sheets Anda (nisn, nama_siswa) sesuai dengan script ini
-                const s = data.find(item => String(item.nisn).trim() === nisnInput);
+                // 2. Isi data ke area cetak SKL (p-nama, p-nisn, dll)
+                document.getElementById('p-nama').innerText = s.nama_siswa;
+                document.getElementById('p-nisn').innerText = s.nisn;
+                
+                // 3. Isi Nilai (Sesuaikan dengan nama kolom di gambar Anda)
+                document.getElementById('p-agama').innerText = s.n_agama_bp || "-";
+                document.getElementById('p-pancasila').innerText = s.n_pendidikan_pancasila || "-";
+                document.getElementById('p-indo').innerText = s.n_bahasa_indonesia || "-";
+                document.getElementById('p-rata').innerText = s.n_rerata_akhir || "-";
 
-                if(s) {
-                    // Isi data ke tampilan
-                    document.getElementById('v-nama').innerText = s.nama_siswa;
-                    document.getElementById('p-nama').innerText = s.nama_siswa;
-                    document.getElementById('p-nisn').innerText = s.nisn;
-                    
-                    // Isi Nilai
-                    document.getElementById('p-agama').innerText = s.n_agama_bp || "-";
-                    document.getElementById('p-pancasila').innerText = s.n_pendidikan_pancasila || "-";
-                    document.getElementById('p-indo').innerText = s.n_bahasa_indonesia || "-";
-                    document.getElementById('p-rata').innerText = s.n_rerata_akhir || "-";
-
-                    // Pindah Layar
-                    document.getElementById('login-box').style.display = "none";
-                    document.getElementById('result-box').style.display = "block";
-                } else {
-                    pesan.innerText = "Maaf, NISN " + nisnInput + " tidak ditemukan!";
-                    pesan.style.color = "red";
-                    btn.innerText = "CEK KELULUSAN SAYA";
-                    btn.disabled = false;
-                }
-            } catch (e) {
-                alert("Gagal mengambil data. Cek koneksi internet!");
+                // 4. Pindah Layar
+                document.getElementById('login-box').style.display = "none";
+                document.getElementById('result-box').style.display = "block";
+                
+                // Bersihkan pesan loading
+                pesan.style.display = "none";
+            } else {
+                pesan.innerText = "Maaf, NISN " + nisnInput + " tidak ditemukan!";
+                pesan.style.color = "red";
                 btn.innerText = "CEK KELULUSAN SAYA";
                 btn.disabled = false;
             }
+        } catch (e) {
+            console.error(e);
+            alert("Terjadi gangguan sesaat. Klik OK dan coba klik tombol CEK sekali lagi.");
+            btn.innerText = "CEK KELULUSAN SAYA";
+            btn.disabled = false;
         }
-    </script>
-</body>
-</html>
+    }
+</script>
+
