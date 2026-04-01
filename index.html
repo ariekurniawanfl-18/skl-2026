@@ -1,1150 +1,201 @@
-<!doctype html>
-<html lang="id" class="h-full">
- <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Kelulusan SMKN 4 Kupang</title>
-  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-  <script src="/_sdk/element_sdk.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&amp;family=Source+Sans+3:wght@300;400;600;700&amp;display=swap" rel="stylesheet">
-  <style>
-  * { box-sizing: border-box; }
-  body { font-family: 'Source Sans 3', sans-serif; }
-  .font-lora { font-family: 'Lora', serif; }
-
-  /* Animations */
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(16px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateX(-20px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-  .fade-in { animation: fadeIn 0.4s ease forwards; }
-  .slide-in { animation: slideIn 0.3s ease forwards; }
-
-  /* Custom scrollbar */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: #f1f5f9; }
-  ::-webkit-scrollbar-thumb { background: #7c2d12; border-radius: 3px; }
-
-  /* Maroon theme */
-  .bg-maroon { background-color: #7c2d12; }
-  .bg-maroon-dark { background-color: #5c1a08; }
-  .bg-maroon-light { background-color: #fef2e8; }
-  .text-maroon { color: #7c2d12; }
-  .border-maroon { border-color: #7c2d12; }
-  .hover-maroon:hover { background-color: #5c1a08; }
-
-  /* Toast */
-  #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
-  .toast { padding: 12px 20px; border-radius: 8px; color: white; font-size: 14px; font-weight: 600; box-shadow: 0 4px 20px rgba(0,0,0,0.15); animation: fadeIn 0.3s ease; min-width: 200px; }
-  .toast-success { background: #166534; }
-  .toast-error { background: #991b1b; }
-  .toast-info { background: #1e40af; }
-
-  /* Grade badge */
-  .grade-badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-weight: 700; font-size: 13px; }
-  .grade-a { background: #dcfce7; color: #166534; }
-  .grade-b { background: #dbeafe; color: #1e40af; }
-  .grade-c { background: #fef9c3; color: #854d0e; }
-  .grade-d { background: #fee2e2; color: #991b1b; }
-
-  /* Table */
-  .data-table { width: 100%; border-collapse: collapse; }
-  .data-table th { background: #7c2d12; color: white; padding: 10px 14px; text-align: left; font-weight: 600; font-size: 13px; }
-  .data-table td { padding: 9px 14px; border-bottom: 1px solid #f1e8e4; font-size: 13px; }
-  .data-table tr:hover td { background: #fef2e8; }
-  .data-table tr:nth-child(even) td { background: #fdf8f6; }
-  .data-table tr:nth-child(even):hover td { background: #fef2e8; }
-
-  /* Print styles */
-  @media print {
-    body * { visibility: hidden; }
-    #print-area, #print-area * { visibility: visible; }
-    #print-area { position: absolute; left: 0; top: 0; width: 100%; }
-  }
-</style>
-  <style>body { box-sizing: border-box; }</style>
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
- </head>
- <body class="h-full bg-stone-100 overflow-auto">
-  <div id="toast-container"></div><!-- APP WRAPPER -->
-  <div id="app" class="h-full w-full">
-   <!-- ===== LOGIN SCREEN ===== -->
-   <div id="screen-login" class="h-full w-full flex items-center justify-center p-6" style="background: linear-gradient(135deg, #3d0e02 0%, #7c2d12 40%, #c2410c 100%);">
-    <div class="w-full max-w-md fade-in">
-     <!-- Logo area -->
-     <div class="text-center mb-8">
-      <div class="flex justify-center gap-6 mb-4">
-       <img src="https://res.cloudinary.com/da9tfnuf8/image/upload/v1771378306/Pemprov_NTT_ufw4i7.png" alt="Logo Pemprov NTT" class="w-16 h-16 object-contain" loading="lazy" onerror="this.style.display='none'"> <img src="https://res.cloudinary.com/da9tfnuf8/image/upload/v1771378298/SMKN_4_Kupang_osklge.png" alt="Logo SMKN 4 Kupang" class="w-16 h-16 object-contain" loading="lazy" onerror="this.style.display='none'">
-      </div>
-      <h1 class="font-lora text-white text-2xl font-bold tracking-wide">SMKN 4 KUPANG</h1>
-      <p class="text-orange-200 text-sm mt-1">Sistem Informasi Kelulusan Siswa</p>
-     </div><!-- Role selector -->
-     <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
-      <div class="flex border-b border-stone-200">
-       <button onclick="switchLoginTab('admin')" id="tab-admin" class="flex-1 py-3 text-sm font-semibold text-white bg-maroon transition-all" style="background:#7c2d12"> <i data-lucide="shield" class="inline w-4 h-4 mr-1"></i> Admin </button> <button onclick="switchLoginTab('siswa')" id="tab-siswa" class="flex-1 py-3 text-sm font-semibold text-stone-500 hover:bg-stone-50 transition-all"> <i data-lucide="user" class="inline w-4 h-4 mr-1"></i> Siswa </button>
-      </div>
-      <div class="p-8">
-       <!-- Admin Login -->
-       <div id="login-admin">
-        <h2 class="font-lora text-xl font-bold text-stone-800 mb-1">Login Admin</h2>
-        <p class="text-stone-500 text-sm mb-6">Masukkan kredensial administrator</p>
-        <div class="space-y-4">
-         <div>
-          <label class="block text-sm font-semibold text-stone-700 mb-1" for="admin-user">Username</label> <input id="admin-user" type="text" placeholder="admin" class="w-full border border-stone-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-800 focus:border-transparent">
-         </div>
-         <div>
-          <label class="block text-sm font-semibold text-stone-700 mb-1" for="admin-pass">Password</label> <input id="admin-pass" type="password" placeholder="••••••••" class="w-full border border-stone-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-800 focus:border-transparent">
-         </div><button onclick="loginAdmin()" class="w-full py-2.5 rounded-lg text-white font-semibold text-sm transition-all bg-maroon hover-maroon shadow-md" style="background:#7c2d12"> Masuk sebagai Admin </button>
-        </div>
-       </div><!-- Siswa Login -->
-       <div id="login-siswa" class="hidden">
-        <h2 class="font-lora text-xl font-bold text-stone-800 mb-1">Cek Kelulusan</h2>
-        <p class="text-stone-500 text-sm mb-6">Masukkan NISN untuk melihat status kelulusan</p>
-        <div class="space-y-4">
-         <div>
-          <label class="block text-sm font-semibold text-stone-700 mb-1" for="siswa-nisn">NISN</label> <input id="siswa-nisn" type="text" placeholder="Masukkan NISN" class="w-full border border-stone-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-800 focus:border-transparent">
-         </div><button onclick="loginSiswa()" class="w-full py-2.5 rounded-lg text-white font-semibold text-sm transition-all bg-maroon hover-maroon shadow-md" style="background:#7c2d12"> Cek Kelulusan Saya </button>
-        </div>
-       </div>
-      </div>
-     </div>
-     <p class="text-center text-orange-200 text-xs mt-4 opacity-70">© 2026 SMKN 4 Kupang — Crew Curriculum_HAFJ</p>
-    </div>
-   </div><!-- ===== ADMIN DASHBOARD ===== -->
-   <div id="screen-admin" class="hidden h-full w-full flex">
-    <!-- Sidebar -->
-    <aside class="w-60 bg-maroon-dark text-white flex flex-col shrink-0" style="background:#3d0e02">
-     <div class="p-5 border-b border-red-900">
-      <div class="flex items-center gap-3">
-       <div class="w-9 h-9 rounded-full bg-orange-500 flex items-center justify-center shrink-0">
-        <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
-       </div>
-       <div>
-        <p class="font-bold text-sm">Administrator</p>
-        <p class="text-orange-300 text-xs">SMKN 4 Kupang</p>
-       </div>
-      </div>
-     </div>
-     <nav class="flex-1 p-3 space-y-1">
-      <button onclick="adminNav('dashboard')" id="anav-dashboard" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold bg-white bg-opacity-10 text-white"> <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard </button> <button onclick="adminNav('input')" id="anav-input" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-orange-200 hover:bg-white hover:bg-opacity-10 transition-all"> <i data-lucide="user-plus" class="w-4 h-4"></i> Input Siswa </button> <button onclick="adminNav('import')" id="anav-import" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-orange-200 hover:bg-white hover:bg-opacity-10 transition-all"> <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Import Excel </button> <button onclick="adminNav('data')" id="anav-data" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-orange-200 hover:bg-white hover:bg-opacity-10 transition-all"> <i data-lucide="database" class="w-4 h-4"></i> Data Siswa </button> <button onclick="adminNav('settings')" id="anav-settings" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-orange-200 hover:bg-white hover:bg-opacity-10 transition-all"> <i data-lucide="settings" class="w-4 h-4"></i> Pengaturan </button>
-     </nav>
-     <div class="p-3">
-      <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-orange-200 hover:bg-white hover:bg-opacity-10 transition-all"> <i data-lucide="log-out" class="w-4 h-4"></i> Keluar </button>
-     </div>
-    </aside><!-- Main content -->
-    <main class="flex-1 overflow-auto bg-stone-100">
-     <!-- Header -->
-     <header class="bg-white border-b border-stone-200 px-8 py-4 flex items-center justify-between sticky top-0 z-10">
-      <div>
-       <h1 id="admin-page-title" class="font-lora text-xl font-bold text-stone-800">Dashboard</h1>
-       <p class="text-stone-500 text-xs" id="admin-page-sub">Ringkasan data kelulusan</p>
-      </div>
-      <div class="flex items-center gap-2 text-xs text-stone-500">
-       <i data-lucide="calendar" class="w-4 h-4"></i> <span id="current-date"></span>
-      </div>
-     </header><!-- Page panels -->
-     <div class="p-8">
-      <!-- DASHBOARD panel -->
-      <div id="apanel-dashboard" class="fade-in">
-       <div class="grid grid-cols-3 gap-6 mb-8">
-        <div class="bg-white rounded-xl p-6 shadow-sm border border-stone-200">
-         <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:#fef2e8">
-           <i data-lucide="users" class="w-6 h-6 text-maroon" style="color:#7c2d12"></i>
-          </div>
-          <div>
-           <p class="text-stone-500 text-xs font-medium">Total Siswa</p>
-           <p id="stat-total" class="text-3xl font-bold text-stone-800">0</p>
-          </div>
-         </div>
-        </div>
-        <div class="bg-white rounded-xl p-6 shadow-sm border border-stone-200">
-         <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-green-50">
-           <i data-lucide="check-circle-2" class="w-6 h-6 text-green-700"></i>
-          </div>
-          <div>
-           <p class="text-stone-500 text-xs font-medium">Lulus</p>
-           <p id="stat-lulus" class="text-3xl font-bold text-green-700">0</p>
-          </div>
-         </div>
-        </div>
-        <div class="bg-white rounded-xl p-6 shadow-sm border border-stone-200">
-         <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-red-50">
-           <i data-lucide="x-circle" class="w-6 h-6 text-red-700"></i>
-          </div>
-          <div>
-           <p class="text-stone-500 text-xs font-medium">Tidak Lulus</p>
-           <p id="stat-tidak" class="text-3xl font-bold text-red-700">0</p>
-          </div>
-         </div>
-        </div>
-       </div>
-       <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
-        <h3 class="font-lora font-bold text-stone-800 mb-4">Data Terbaru</h3>
-        <div id="dashboard-recent" class="overflow-x-auto">
-         <p class="text-stone-400 text-sm text-center py-8">Belum ada data siswa</p>
-        </div>
-       </div>
-      </div><!-- INPUT panel -->
-      <div id="apanel-input" class="hidden fade-in">
-       <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-8 max-w-3xl">
-        <h3 class="font-lora text-lg font-bold text-stone-800 mb-6 pb-3 border-b border-stone-100">Data Identitas Siswa</h3>
-        <div class="grid grid-cols-2 gap-4 mb-6">
-         <div>
-          <label class="block text-xs font-semibold text-stone-600 mb-1" for="in-nisn">NISN *</label> <input id="in-nisn" type="text" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div>
-         <div>
-          <label class="block text-xs font-semibold text-stone-600 mb-1" for="in-nama">Nama Lengkap *</label> <input id="in-nama" type="text" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div>
-         <div>
-          <label class="block text-xs font-semibold text-stone-600 mb-1" for="in-ttl">Tempat Lahir *</label> <input id="in-ttl" type="text" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div>
-         <div>
-          <label class="block text-xs font-semibold text-stone-600 mb-1" for="in-tgl">Tanggal Lahir *</label> <input id="in-tgl" type="date" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div>
-         <div>
-          <label class="block text-xs font-semibold text-stone-600 mb-1" for="in-jk">Jenis Kelamin</label> <select id="in-jk" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800"> <option value="Laki-laki">Laki-laki</option> <option value="Perempuan">Perempuan</option> </select>
-         </div>
-         <div>
-          <label class="block text-xs font-semibold text-stone-600 mb-1" for="in-konsentrasi">Konsentrasi Keahlian *</label> <input id="in-konsentrasi" type="text" placeholder="Misal: Teknik Komputer dan Jaringan" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div>
-        </div>
-        <h3 class="font-lora text-lg font-bold text-stone-800 mb-4 pb-3 border-b border-stone-100">Nilai Kelompok Umum</h3>
-        <div class="grid grid-cols-3 gap-4 mb-6">
-         <div><label class="block text-xs font-semibold text-stone-600 mb-1" for="in-agama">Pend. Agama &amp; Budi Pekerti</label><input id="in-agama" type="number" min="0" max="100" value="0" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div>
-         <div><label class="block text-xs font-semibold text-stone-600 mb-1" for="in-pancasila">Pendidikan Pancasila</label><input id="in-pancasila" type="number" min="0" max="100" value="0" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div>
-         <div><label class="block text-xs font-semibold text-stone-600 mb-1" for="in-bindo">Bahasa Indonesia</label><input id="in-bindo" type="number" min="0" max="100" value="0" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div>
-         <div><label class="block text-xs font-semibold text-stone-600 mb-1" for="in-pjok">PJOK</label><input id="in-pjok" type="number" min="0" max="100" value="0" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div>
-         <div><label class="block text-xs font-semibold text-stone-600 mb-1" for="in-sejarah">Sejarah</label><input id="in-sejarah" type="number" min="0" max="100" value="0" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div>
-         <div><label class="block text-xs font-semibold text-stone-600 mb-1" for="in-seni">Seni Budaya</label><input id="in-seni" type="number" min="0" max="100" value="0" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div>
-        </div>
-        <h3 class="font-lora text-lg font-bold text-stone-800 mb-4 pb-3 border-b border-stone-100">Nilai Kelompok Kejuruan</h3>
-        <div class="grid grid-cols-3 gap-4 mb-8">
-         <div><label class="block text-xs font-semibold text-stone-600 mb-1" for="in-mtk">Matematika</label><input id="in-mtk" type="number" min="0" max="100" value="0" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div>
-         <div><label class="block text-xs font-semibold text-stone-600 mb-1" for="in-bing">Bahasa Inggris</label><input id="in-bing" type="number" min="0" max="100" value="0" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div>
-         <div><label class="block text-xs font-semibold text-stone-600 mb-1" for="in-info">Informatika</label><input id="in-info" type="number" min="0" max="100" value="0" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div>
-         <div><label class="block text-xs font-semibold text-stone-600 mb-1" for="in-ipas">Proyek IPAS</label><input id="in-ipas" type="number" min="0" max="100" value="0" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div>
-         <div><label class="block text-xs font-semibold text-stone-600 mb-1" for="in-dasar">Dasar Program Keahlian</label><input id="in-dasar" type="number" min="0" max="100" value="0" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div>
-         <div><label class="block text-xs font-semibold text-stone-600 mb-1" for="in-konsnilai">Konsentrasi Keahlian</label><input id="in-konsnilai" type="number" min="0" max="100" value="0" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div>
-         <div><label class="block text-xs font-semibold text-stone-600 mb-1" for="in-projek">Projek Kewirausahaan</label><input id="in-projek" type="number" min="0" max="100" value="0" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div>
-         <div><label class="block text-xs font-semibold text-stone-600 mb-1" for="in-pkl">PKL</label><input id="in-pkl" type="number" min="0" max="100" value="0" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div>
-         <div><label class="block text-xs font-semibold text-stone-600 mb-1" for="in-pilihan">Mata Pelajaran Pilihan</label><input id="in-pilihan" type="number" min="0" max="100" value="0" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div>
-        </div>
-        <div class="flex gap-3">
-         <button onclick="simpanSiswa()" class="px-6 py-2.5 rounded-lg text-white font-semibold text-sm transition-all bg-maroon hover-maroon shadow-md" style="background:#7c2d12"> <i data-lucide="save" class="inline w-4 h-4 mr-1"></i> Simpan Data </button> <button onclick="resetForm()" class="px-6 py-2.5 rounded-lg text-stone-600 font-semibold text-sm border border-stone-300 hover:bg-stone-50 transition-all"> <i data-lucide="rotate-ccw" class="inline w-4 h-4 mr-1"></i> Reset </button>
-        </div>
-       </div>
-      </div><!-- IMPORT panel -->
-      <div id="apanel-import" class="hidden fade-in">
-       <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-8 max-w-4xl">
-        <h3 class="font-lora text-lg font-bold text-stone-800 mb-2">Import Data dari Excel</h3>
-        <p class="text-stone-500 text-sm mb-6">Copy data dari Excel lalu paste di area bawah. Pastikan urutan kolom sesuai.</p>
-        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
-         <p class="text-amber-800 font-semibold text-sm mb-2"><i data-lucide="info" class="inline w-4 h-4 mr-1"></i> Format Kolom Excel (pisah TAB):</p>
-         <p class="text-amber-700 text-xs font-mono leading-relaxed">NISN | Nama | Tempat Lahir | Tanggal Lahir | JK | Konsentrasi | Agama | Pancasila | Bhs Indo | PJOK | Sejarah | Seni | Matematika | Bhs Inggris | Informatika | IPAS | Dasar | Konsentrasi Nilai | Projek | PKL | Pilihan</p>
-         <p class="text-amber-600 text-xs mt-2">Total: 21 kolom. Format tanggal: YYYY-MM-DD atau DD/MM/YYYY</p>
-        </div>
-        <div>
-         <label class="block text-xs font-semibold text-stone-600 mb-2" for="excel-paste">Paste Data Excel di sini:</label> <textarea id="excel-paste" rows="10" placeholder="Paste data Excel di sini (Ctrl+V)..." class="w-full border-2 border-dashed border-stone-300 rounded-xl px-4 py-3 text-xs font-mono focus:outline-none focus:border-red-800 resize-none"></textarea>
-        </div>
-        <div class="flex gap-3 mt-4">
-         <button onclick="importExcel()" class="px-6 py-2.5 rounded-lg text-white font-semibold text-sm transition-all bg-maroon hover-maroon shadow-md" style="background:#7c2d12"> <i data-lucide="upload" class="inline w-4 h-4 mr-1"></i> Proses Import </button> <button onclick="document.getElementById('excel-paste').value=''" class="px-6 py-2.5 rounded-lg text-stone-600 font-semibold text-sm border border-stone-300 hover:bg-stone-50 transition-all"> Bersihkan </button>
-        </div>
-        <div id="import-result" class="mt-4"></div>
-       </div>
-      </div><!-- DATA panel -->
-      <div id="apanel-data" class="hidden fade-in">
-       <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
-        <div class="px-6 py-4 border-b border-stone-100 flex items-center justify-between">
-         <div class="flex items-center gap-3">
-          <h3 class="font-lora font-bold text-stone-800">Data Seluruh Siswa</h3><span id="data-count" class="bg-stone-100 text-stone-600 text-xs font-semibold px-2 py-1 rounded-full">0 siswa</span>
-         </div>
-         <div class="flex items-center gap-2">
-          <input id="search-siswa" type="search" placeholder="Cari nama / NISN..." class="border border-stone-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-800 w-48" oninput="renderDataTable()"> <button onclick="if(confirm2Delete()) hapusSemuaData()" class="px-3 py-1.5 rounded-lg text-red-700 text-xs font-semibold border border-red-200 hover:bg-red-50 transition-all"> <i data-lucide="trash-2" class="inline w-3 h-3 mr-1"></i>Hapus Semua </button>
-         </div>
-        </div>
-        <div class="overflow-x-auto">
-         <table class="data-table" id="main-data-table">
-          <thead>
-           <tr>
-            <th>No</th>
-            <th>NISN</th>
-            <th>Nama</th>
-            <th>Konsentrasi</th>
-            <th>Rata Umum</th>
-            <th>Rata Kejuruan</th>
-            <th>Rata Total</th>
-            <th>Status</th>
-            <th>Aksi</th>
-           </tr>
-          </thead>
-          <tbody id="data-table-body">
-           <tr>
-            <td colspan="9" class="text-center text-stone-400 py-10">Belum ada data</td>
-           </tr>
-          </tbody>
-         </table>
-        </div>
-       </div>
-      </div><!-- SETTINGS panel -->
-      <div id="apanel-settings" class="hidden fade-in">
-       <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-8 max-w-lg">
-        <h3 class="font-lora text-lg font-bold text-stone-800 mb-6 pb-3 border-b border-stone-100">Pengaturan Dokumen</h3>
-        <div class="space-y-4">
-         <div>
-          <label class="block text-xs font-semibold text-stone-600 mb-1" for="set-kepsek">Nama Kepala Sekolah</label> <input id="set-kepsek" type="text" placeholder="Drs. Nama Kepala Sekolah, M.Pd." class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div>
-         <div>
-          <label class="block text-xs font-semibold text-stone-600 mb-1" for="set-nip">NIP Kepala Sekolah</label> <input id="set-nip" type="text" placeholder="19XXXXXXXXX" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div>
-         <div>
-          <label class="block text-xs font-semibold text-stone-600 mb-1" for="set-tahun">Tahun Pelajaran</label> <input id="set-tahun" type="text" placeholder="2024/2025" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div>
-         <div>
-          <label class="block text-xs font-semibold text-stone-600 mb-1" for="set-kota">Kota</label> <input id="set-kota" type="text" value="Kupang" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div>
-         <div>
-          <label class="block text-xs font-semibold text-stone-600 mb-1" for="set-tanggal">Tanggal SKL</label> <input id="set-tanggal" type="date" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div>
-         <div>
-          <label class="block text-xs font-semibold text-stone-600 mb-1" for="set-nomorsurat">Nomor Surat (opsional)</label> <input id="set-nomorsurat" type="text" placeholder="420/SKL/SMKN4KPG/2025" class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-800">
-         </div><button onclick="simpanSettings()" class="px-6 py-2.5 rounded-lg text-white font-semibold text-sm transition-all bg-maroon hover-maroon shadow-md mt-2" style="background:#7c2d12"> <i data-lucide="save" class="inline w-4 h-4 mr-1"></i> Simpan Pengaturan </button>
-        </div>
-       </div>
-      </div>
-     </div><!-- end p-8 -->
-    </main>
-   </div><!-- ===== SISWA VIEW ===== -->
-   <div id="screen-siswa" class="hidden h-full w-full overflow-auto" style="background: linear-gradient(160deg, #fef9f7 0%, #fce7d6 100%);">
-    <div class="max-w-2xl mx-auto p-6">
-     <!-- Header bar -->
-     <div class="flex items-center justify-between mb-6">
-      <div class="flex items-center gap-3">
-       <img src="https://res.cloudinary.com/da9tfnuf8/image/upload/v1771378298/SMKN_4_Kupang_osklge.png" alt="Logo" class="w-10 h-10 object-contain" loading="lazy" onerror="this.style.display='none'">
-       <div>
-        <p class="font-bold text-stone-800 text-sm leading-tight">SMKN 4 Kupang</p>
-        <p class="text-stone-500 text-xs">Sistem Kelulusan Siswa</p>
-       </div>
-      </div><button onclick="logout()" class="flex items-center gap-1.5 text-xs text-stone-500 hover:text-red-800 transition-colors font-medium"> <i data-lucide="log-out" class="w-4 h-4"></i> Keluar </button>
-     </div><!-- Status card -->
-     <div id="siswa-status-card" class="rounded-2xl shadow-lg overflow-hidden mb-6 fade-in">
-      <div class="bg-maroon p-6 text-white" style="background:linear-gradient(135deg,#7c2d12,#b91c1c)">
-       <div class="flex items-center justify-between">
-        <div>
-         <p class="text-orange-200 text-xs font-medium uppercase tracking-wider mb-1">Status Kelulusan</p>
-         <p id="sv-status" class="text-3xl font-black font-lora">LULUS</p>
-         <p id="sv-tahun" class="text-orange-200 text-sm mt-1">Tahun Pelajaran 2024/2025</p>
-        </div>
-        <div id="sv-badge" class="w-20 h-20 rounded-full bg-white bg-opacity-20 border-4 border-white border-opacity-50 flex items-center justify-center">
-         <i data-lucide="check-circle-2" class="w-10 h-10 text-white"></i>
-        </div>
-       </div>
-      </div>
-      <div class="bg-white p-6">
-       <div class="grid grid-cols-2 gap-4">
-        <div>
-         <p class="text-stone-400 text-xs font-medium">Nama Lengkap</p>
-         <p id="sv-nama" class="text-stone-800 font-bold text-base">—</p>
-        </div>
-        <div>
-         <p class="text-stone-400 text-xs font-medium">NISN</p>
-         <p id="sv-nisn" class="text-stone-800 font-bold">—</p>
-        </div>
-        <div>
-         <p class="text-stone-400 text-xs font-medium">Tempat, Tanggal Lahir</p>
-         <p id="sv-ttl" class="text-stone-800 font-semibold text-sm">—</p>
-        </div>
-        <div>
-         <p class="text-stone-400 text-xs font-medium">Konsentrasi Keahlian</p>
-         <p id="sv-konsentrasi" class="text-stone-800 font-semibold text-sm">—</p>
-        </div>
-       </div><!-- Rata-rata highlight -->
-       <div class="mt-5 grid grid-cols-3 gap-3">
-        <div class="text-center bg-stone-50 rounded-xl p-3 border border-stone-100">
-         <p class="text-stone-400 text-xs">Rata Umum</p>
-         <p id="sv-rata-umum" class="text-2xl font-black text-stone-800">—</p>
-        </div>
-        <div class="text-center rounded-xl p-3 border-2" style="background:#fef2e8;border-color:#7c2d12">
-         <p class="text-xs font-medium" style="color:#7c2d12">Rata-Rata Total</p>
-         <p id="sv-rata-total" class="text-3xl font-black" style="color:#7c2d12">—</p>
-        </div>
-        <div class="text-center bg-stone-50 rounded-xl p-3 border border-stone-100">
-         <p class="text-stone-400 text-xs">Rata Kejuruan</p>
-         <p id="sv-rata-kejuruan" class="text-2xl font-black text-stone-800">—</p>
-        </div>
-       </div>
-      </div>
-     </div><!-- Print button --> <button onclick="printDokumen(currentSiswa)" class="w-full py-4 rounded-2xl text-white font-bold text-base shadow-lg transition-all hover-maroon" style="background:linear-gradient(135deg,#7c2d12,#b91c1c)"> <i data-lucide="printer" class="inline w-5 h-5 mr-2"></i> Cetak Surat Keterangan Lulus &amp; Transkrip Nilai </button>
-     <p class="text-center text-stone-400 text-xs mt-3">Dokumen akan dibuka di tab baru siap cetak A4</p>
-    </div>
-   </div>
-  </div><!-- end app --> <!-- Delete confirm overlay -->
-  <div id="delete-confirm-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-   <div class="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 shadow-2xl">
-    <div class="text-center mb-4">
-     <div class="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-3">
-      <i data-lucide="trash-2" class="w-7 h-7 text-red-600"></i>
-     </div>
-     <h3 class="font-lora font-bold text-stone-800 text-lg">Hapus Semua Data?</h3>
-     <p class="text-stone-500 text-sm mt-1">Tindakan ini tidak dapat dibatalkan. Semua data siswa akan dihapus permanen.</p>
-    </div>
-    <div class="flex gap-3">
-     <button onclick="closeDeleteConfirm()" class="flex-1 py-2.5 border border-stone-300 rounded-lg text-stone-600 font-semibold text-sm hover:bg-stone-50">Batal</button> <button onclick="confirmDeleteAll()" class="flex-1 py-2.5 bg-red-700 rounded-lg text-white font-semibold text-sm hover:bg-red-800">Hapus Semua</button>
-    </div>
-   </div>
-  </div>
-  <script>
-// ==================== CONFIG ====================
-const ADMIN_USER = 'admin';
-const ADMIN_PASS = 'smkn4kupang';
-const LS_KEY = 'smkn4_siswa_data';
-const LS_SETTINGS = 'smkn4_settings';
-
-let currentSiswa = null;
-let deleteConfirmResolve = null;
-
-// ==================== INIT ====================
-window.addEventListener('load', () => {
-  // Set current date
-  const d = new Date();
-  const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-  document.getElementById('current-date').textContent = `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
-
-  // Load settings
-  loadSettings();
-
-  lucide.createIcons();
-});
-
-// ==================== ELEMENT SDK ====================
-const defaultConfig = {
-  school_name: 'SMK NEGERI 4 KUPANG',
-  principal_name: 'Drs. Nama Kepala Sekolah, M.Pd.',
-  principal_nip: '196501011990031001',
-  academic_year: '2024/2025',
-  city_name: 'Kupang'
-};
-
-window.elementSdk && window.elementSdk.init({
-  defaultConfig,
-  onConfigChange: async (config) => {
-    // Sync to settings inputs if visible
-    const fields = ['principal_name','principal_nip','academic_year','city_name'];
-    fields.forEach(f => {
-      const el = document.getElementById('set-' + (f === 'principal_name' ? 'kepsek' : f === 'principal_nip' ? 'nip' : f === 'academic_year' ? 'tahun' : 'kota'));
-      if(el && !el.value) el.value = config[f] || defaultConfig[f];
-    });
-  },
-  mapToCapabilities: (config) => ({
-    recolorables: [],
-    borderables: [],
-    fontEditable: undefined,
-    fontSizeable: undefined
-  }),
-  mapToEditPanelValues: (config) => new Map([
-    ['school_name', config.school_name || defaultConfig.school_name],
-    ['principal_name', config.principal_name || defaultConfig.principal_name],
-    ['principal_nip', config.principal_nip || defaultConfig.principal_nip],
-    ['academic_year', config.academic_year || defaultConfig.academic_year],
-    ['city_name', config.city_name || defaultConfig.city_name]
-  ])
-});
-
-// ==================== SETTINGS ====================
-function loadSettings() {
-  const s = JSON.parse(localStorage.getItem(LS_SETTINGS) || '{}');
-  if(s.kepsek) document.getElementById('set-kepsek').value = s.kepsek;
-  if(s.nip) document.getElementById('set-nip').value = s.nip;
-  if(s.tahun) document.getElementById('set-tahun').value = s.tahun;
-  if(s.kota) document.getElementById('set-kota').value = s.kota;
-  if(s.tanggal) document.getElementById('set-tanggal').value = s.tanggal;
-  if(s.nomorsurat) document.getElementById('set-nomorsurat').value = s.nomorsurat;
-}
-function getSettings() {
-  const s = JSON.parse(localStorage.getItem(LS_SETTINGS) || '{}');
-  const cfg = window.elementSdk ? window.elementSdk.config : defaultConfig;
-  return {
-    kepsek: s.kepsek || cfg.principal_name || defaultConfig.principal_name,
-    nip: s.nip || cfg.principal_nip || defaultConfig.principal_nip,
-    tahun: s.tahun || cfg.academic_year || defaultConfig.academic_year,
-    kota: s.kota || cfg.city_name || defaultConfig.city_name,
-    tanggal: s.tanggal || '',
-    nomorsurat: s.nomorsurat || ''
-  };
-}
-function simpanSettings() {
-  const s = {
-    kepsek: document.getElementById('set-kepsek').value,
-    nip: document.getElementById('set-nip').value,
-    tahun: document.getElementById('set-tahun').value,
-    kota: document.getElementById('set-kota').value,
-    tanggal: document.getElementById('set-tanggal').value,
-    nomorsurat: document.getElementById('set-nomorsurat').value
-  };
-  localStorage.setItem(LS_SETTINGS, JSON.stringify(s));
-  toast('Pengaturan berhasil disimpan', 'success');
-}
-
-// ==================== DATA ====================
-function getSiswaData() {
-  return JSON.parse(localStorage.getItem(LS_KEY) || '[]');
-}
-function setSiswaData(data) {
-  localStorage.setItem(LS_KEY, JSON.stringify(data));
-}
-function calcRata(siswa) {
-  const u = siswa.nilai_umum;
-  const k = siswa.nilai_kejuruan;
-  const ru = ((u.agama + u.pancasila + u.bahasa_indonesia + u.pjok + u.sejarah + u.seni_budaya) / 6);
-  const rk = ((k.matematika + k.bahasa_inggris + k.informatika + k.ipas + k.dasar + k.konsentrasi + k.projek + k.pkl + k.pilihan) / 9);
-  const rt = ((ru * 6 + rk * 9) / 15);
-  return { ru: Math.round(ru * 100) / 100, rk: Math.round(rk * 100) / 100, rt: Math.round(rt * 100) / 100 };
-}
-function isLulus(siswa) {
-  const r = calcRata(siswa);
-  // Lulus jika rata-rata total >= 60 dan tidak ada nilai < 55
-  const allValues = [
-    ...Object.values(siswa.nilai_umum),
-    ...Object.values(siswa.nilai_kejuruan)
-  ];
-  return r.rt >= 60 && allValues.every(v => v >= 55);
-}
-function gradeLabel(v) {
-  if(v >= 90) return '<span class="grade-badge grade-a">A</span>';
-  if(v >= 80) return '<span class="grade-badge grade-b">B</span>';
-  if(v >= 70) return '<span class="grade-badge grade-c">C</span>';
-  return '<span class="grade-badge grade-d">D</span>';
-}
-
-// ==================== AUTH ====================
-function loginAdmin() {
-  const u = document.getElementById('admin-user').value;
-  const p = document.getElementById('admin-pass').value;
-  if(u === ADMIN_USER && p === ADMIN_PASS) {
-    showScreen('admin');
-    updateDashboardStats();
-  } else {
-    toast('Username atau password salah', 'error');
-  }
-}
-function loginSiswa() {
-  const nisn = document.getElementById('siswa-nisn').value.trim();
-  if(!nisn) { toast('Masukkan NISN terlebih dahulu', 'error'); return; }
-  const data = getSiswaData();
-  const siswa = data.find(s => s.nisn === nisn);
-  if(!siswa) {
-    toast('NISN tidak ditemukan dalam sistem', 'error'); return;
-  }
-  currentSiswa = siswa;
-  showSiswaView(siswa);
-  showScreen('siswa');
-}
-function logout() {
-  showScreen('login');
-  currentSiswa = null;
-  document.getElementById('siswa-nisn').value = '';
-  document.getElementById('admin-user').value = '';
-  document.getElementById('admin-pass').value = '';
-}
-
-// ==================== SCREENS ====================
-function showScreen(name) {
-  ['login','admin','siswa'].forEach(s => {
-    document.getElementById('screen-' + s).classList.add('hidden');
-  });
-  document.getElementById('screen-' + name).classList.remove('hidden');
-  lucide.createIcons();
-}
-function switchLoginTab(tab) {
-  document.getElementById('login-admin').classList.toggle('hidden', tab !== 'admin');
-  document.getElementById('login-siswa').classList.toggle('hidden', tab !== 'siswa');
-  document.getElementById('tab-admin').style.background = tab === 'admin' ? '#7c2d12' : '';
-  document.getElementById('tab-admin').style.color = tab === 'admin' ? 'white' : '';
-  document.getElementById('tab-siswa').style.background = tab === 'siswa' ? '#7c2d12' : '';
-  document.getElementById('tab-siswa').style.color = tab === 'siswa' ? 'white' : '';
-  if(tab === 'admin') {
-    document.getElementById('tab-admin').className = 'flex-1 py-3 text-sm font-semibold text-white transition-all';
-    document.getElementById('tab-siswa').className = 'flex-1 py-3 text-sm font-semibold text-stone-500 hover:bg-stone-50 transition-all';
-  } else {
-    document.getElementById('tab-siswa').className = 'flex-1 py-3 text-sm font-semibold text-white transition-all';
-    document.getElementById('tab-admin').className = 'flex-1 py-3 text-sm font-semibold text-stone-500 hover:bg-stone-50 transition-all';
-  }
-}
-
-// ==================== ADMIN NAV ====================
-function adminNav(panel) {
-  ['dashboard','input','import','data','settings'].forEach(p => {
-    document.getElementById('apanel-' + p).classList.add('hidden');
-    const btn = document.getElementById('anav-' + p);
-    btn.style.background = '';
-    btn.className = 'w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-orange-200 hover:bg-white hover:bg-opacity-10 transition-all';
-  });
-  document.getElementById('apanel-' + panel).classList.remove('hidden');
-  const btn = document.getElementById('anav-' + panel);
-  btn.className = 'w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold bg-white bg-opacity-10 text-white';
-
-  const titles = {
-    dashboard: ['Dashboard', 'Ringkasan data kelulusan'],
-    input: ['Input Data Siswa', 'Tambah data siswa baru secara manual'],
-    import: ['Import dari Excel', 'Import data massal via paste Excel'],
-    data: ['Data Seluruh Siswa', 'Lihat, cari, dan kelola data siswa'],
-    settings: ['Pengaturan', 'Konfigurasi dokumen dan tanda tangan']
-  };
-  document.getElementById('admin-page-title').textContent = titles[panel][0];
-  document.getElementById('admin-page-sub').textContent = titles[panel][1];
-
-  if(panel === 'data') { renderDataTable(); }
-  if(panel === 'dashboard') { updateDashboardStats(); }
-  lucide.createIcons();
-}
-
-// ==================== DASHBOARD STATS ====================
-function updateDashboardStats() {
-  const data = getSiswaData();
-  const lulus = data.filter(s => isLulus(s));
-  document.getElementById('stat-total').textContent = data.length;
-  document.getElementById('stat-lulus').textContent = lulus.length;
-  document.getElementById('stat-tidak').textContent = data.length - lulus.length;
-
-  // Recent 5
-  const recent = data.slice(-5).reverse();
-  const el = document.getElementById('dashboard-recent');
-  if(!recent.length) {
-    el.innerHTML = '<p class="text-stone-400 text-sm text-center py-8">Belum ada data siswa</p>';
-    return;
-  }
-  let html = '<table class="data-table"><thead><tr><th>Nama</th><th>NISN</th><th>Konsentrasi</th><th>Rata Total</th><th>Status</th></tr></thead><tbody>';
-  recent.forEach(s => {
-    const r = calcRata(s);
-    const lls = isLulus(s);
-    html += `<tr>
-      <td class="font-semibold">${s.nama}</td>
-      <td>${s.nisn}</td>
-      <td>${s.konsentrasi}</td>
-      <td class="font-bold">${r.rt}</td>
-      <td><span class="grade-badge ${lls ? 'grade-a' : 'grade-d'}">${lls ? 'LULUS' : 'TIDAK LULUS'}</span></td>
-    </tr>`;
-  });
-  html += '</tbody></table>';
-  el.innerHTML = html;
-  lucide.createIcons();
-}
-
-// ==================== SISWA VIEW ====================
-function showSiswaView(siswa) {
-  const r = calcRata(siswa);
-  const lls = isLulus(siswa);
-  const s = getSettings();
-
-  document.getElementById('sv-nama').textContent = siswa.nama;
-  document.getElementById('sv-nisn').textContent = siswa.nisn;
-  document.getElementById('sv-ttl').textContent = `${siswa.tempat_lahir}, ${formatTgl(siswa.tanggal_lahir)}`;
-  document.getElementById('sv-konsentrasi').textContent = siswa.konsentrasi;
-  document.getElementById('sv-rata-umum').textContent = r.ru.toFixed(2);
-  document.getElementById('sv-rata-kejuruan').textContent = r.rk.toFixed(2);
-  document.getElementById('sv-rata-total').textContent = r.rt.toFixed(2);
-  document.getElementById('sv-status').textContent = lls ? 'LULUS' : 'TIDAK LULUS';
-  document.getElementById('sv-tahun').textContent = `Tahun Pelajaran ${s.tahun || defaultConfig.academic_year}`;
-
-  const badge = document.getElementById('sv-badge');
-  if(lls) {
-    badge.innerHTML = '<i data-lucide="check-circle-2" class="w-10 h-10 text-white"></i>';
-    document.getElementById('sv-status').className = 'text-3xl font-black font-lora text-white';
-  } else {
-    badge.innerHTML = '<i data-lucide="x-circle" class="w-10 h-10 text-red-200"></i>';
-    document.getElementById('sv-status').className = 'text-3xl font-black font-lora text-red-200';
-  }
-
-  // Nilai umum
-  const umumMapel = [
-    ['Pend. Agama & Budi Pekerti', siswa.nilai_umum.agama],
-    ['Pendidikan Pancasila', siswa.nilai_umum.pancasila],
-    ['Bahasa Indonesia', siswa.nilai_umum.bahasa_indonesia],
-    ['PJOK', siswa.nilai_umum.pjok],
-    ['Sejarah', siswa.nilai_umum.sejarah],
-    ['Seni Budaya', siswa.nilai_umum.seni_budaya],
-  ];
-  let html = '';
-  umumMapel.forEach(([n, v]) => {
-    html += `<tr class="border-b border-stone-50"><td class="py-2 text-stone-700 text-sm">${n}</td><td class="py-2 text-right font-bold text-stone-800">${v}</td><td class="py-2 text-right">${gradeLabel(v)}</td></tr>`;
-  });
-  html += `<tr class="border-t-2 border-stone-200"><td class="py-2 text-sm font-bold text-maroon" style="color:#7c2d12">Rata-rata Umum</td><td class="py-2 text-right font-black text-maroon" style="color:#7c2d12">${r.ru.toFixed(2)}</td><td></td></tr>`;
-  // Removed: detail nilai table rendering
-
-  const kejMapel = [
-    ['Matematika', siswa.nilai_kejuruan.matematika],
-    ['Bahasa Inggris', siswa.nilai_kejuruan.bahasa_inggris],
-    ['Informatika', siswa.nilai_kejuruan.informatika],
-    ['Proyek IPAS', siswa.nilai_kejuruan.ipas],
-    ['Dasar Program Keahlian', siswa.nilai_kejuruan.dasar],
-    ['Konsentrasi Keahlian', siswa.nilai_kejuruan.konsentrasi],
-    ['Projek Kewirausahaan', siswa.nilai_kejuruan.projek],
-    ['PKL', siswa.nilai_kejuruan.pkl],
-    ['Mata Pelajaran Pilihan', siswa.nilai_kejuruan.pilihan],
-  ];
-  html = '';
-  kejMapel.forEach(([n, v]) => {
-    html += `<tr class="border-b border-stone-50"><td class="py-2 text-stone-700 text-sm">${n}</td><td class="py-2 text-right font-bold text-stone-800">${v}</td><td class="py-2 text-right">${gradeLabel(v)}</td></tr>`;
-  });
-  html += `<tr class="border-t-2 border-stone-200"><td class="py-2 text-sm font-bold text-maroon" style="color:#7c2d12">Rata-rata Kejuruan</td><td class="py-2 text-right font-black text-maroon" style="color:#7c2d12">${r.rk.toFixed(2)}</td><td></td></tr>`;
-  // Removed: detail nilai table rendering
-
-  lucide.createIcons();
-}
-
-// ==================== INPUT FORM ====================
-function simpanSiswa() {
-  const nisn = document.getElementById('in-nisn').value.trim();
-  const nama = document.getElementById('in-nama').value.trim();
-  if(!nisn || !nama) { toast('NISN dan Nama wajib diisi', 'error'); return; }
-
-  const siswa = {
-    nisn,
-    nama,
-    tempat_lahir: document.getElementById('in-ttl').value.trim(),
-    tanggal_lahir: document.getElementById('in-tgl').value,
-    jk: document.getElementById('in-jk').value,
-    konsentrasi: document.getElementById('in-konsentrasi').value.trim(),
-    nilai_umum: {
-      agama: +document.getElementById('in-agama').value,
-      pancasila: +document.getElementById('in-pancasila').value,
-      bahasa_indonesia: +document.getElementById('in-bindo').value,
-      pjok: +document.getElementById('in-pjok').value,
-      sejarah: +document.getElementById('in-sejarah').value,
-      seni_budaya: +document.getElementById('in-seni').value,
-    },
-    nilai_kejuruan: {
-      matematika: +document.getElementById('in-mtk').value,
-      bahasa_inggris: +document.getElementById('in-bing').value,
-      informatika: +document.getElementById('in-info').value,
-      ipas: +document.getElementById('in-ipas').value,
-      dasar: +document.getElementById('in-dasar').value,
-      konsentrasi: +document.getElementById('in-konsnilai').value,
-      projek: +document.getElementById('in-projek').value,
-      pkl: +document.getElementById('in-pkl').value,
-      pilihan: +document.getElementById('in-pilihan').value,
-    }
-  };
-
-  const data = getSiswaData();
-  const idx = data.findIndex(s => s.nisn === nisn);
-  if(idx >= 0) {
-    data[idx] = siswa;
-    toast(`Data ${nama} berhasil diperbarui`, 'success');
-  } else {
-    data.push(siswa);
-    toast(`Data ${nama} berhasil disimpan`, 'success');
-  }
-  setSiswaData(data);
-  resetForm();
-}
-function resetForm() {
-  ['in-nisn','in-nama','in-ttl','in-konsentrasi'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('in-tgl').value = '';
-  document.getElementById('in-jk').value = 'Laki-laki';
-  ['in-agama','in-pancasila','in-bindo','in-pjok','in-sejarah','in-seni',
-   'in-mtk','in-bing','in-info','in-ipas','in-dasar','in-konsnilai','in-projek','in-pkl','in-pilihan']
-    .forEach(id => document.getElementById(id).value = 0);
-}
-
-// ==================== IMPORT EXCEL ====================
-function importExcel() {
-  const raw = document.getElementById('excel-paste').value.trim();
-  if(!raw) { toast('Paste data Excel terlebih dahulu', 'error'); return; }
-
-  const lines = raw.split('\n').filter(l => l.trim());
-  let success = 0, failed = 0, errors = [];
-
-  const data = getSiswaData();
-
-  lines.forEach((line, li) => {
-    const cols = line.split('\t');
-    if(cols.length < 21) {
-      failed++;
-      errors.push(`Baris ${li+1}: hanya ${cols.length} kolom (butuh 21)`);
-      return;
-    }
-    const nisn = cols[0].trim();
-    if(!nisn) { failed++; errors.push(`Baris ${li+1}: NISN kosong`); return; }
-
-    const parseN = (v) => {
-      const n = parseFloat(v.trim().replace(',','.'));
-      return isNaN(n) ? 0 : Math.min(100, Math.max(0, n));
-    };
-
-    // Parse tanggal
-    let tgl = cols[3].trim();
-    if(tgl.includes('/')) {
-      const parts = tgl.split('/');
-      if(parts.length === 3) tgl = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
-    }
-
-    const siswa = {
-      nisn,
-      nama: cols[1].trim(),
-      tempat_lahir: cols[2].trim(),
-      tanggal_lahir: tgl,
-      jk: cols[4].trim(),
-      konsentrasi: cols[5].trim(),
-      nilai_umum: {
-        agama: parseN(cols[6]),
-        pancasila: parseN(cols[7]),
-        bahasa_indonesia: parseN(cols[8]),
-        pjok: parseN(cols[9]),
-        sejarah: parseN(cols[10]),
-        seni_budaya: parseN(cols[11])
-      },
-      nilai_kejuruan: {
-        matematika: parseN(cols[12]),
-        bahasa_inggris: parseN(cols[13]),
-        informatika: parseN(cols[14]),
-        ipas: parseN(cols[15]),
-        dasar: parseN(cols[16]),
-        konsentrasi: parseN(cols[17]),
-        projek: parseN(cols[18]),
-        pkl: parseN(cols[19]),
-        pilihan: parseN(cols[20])
-      }
-    };
-
-    const idx = data.findIndex(s => s.nisn === nisn);
-    if(idx >= 0) data[idx] = siswa; else data.push(siswa);
-    success++;
-  });
-
-  setSiswaData(data);
-
-  let resultHtml = `<div class="rounded-xl p-4 ${success > 0 ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}">`;
-  resultHtml += `<p class="font-bold ${success > 0 ? 'text-green-800' : 'text-red-800'} mb-1">✓ ${success} data berhasil diimport${failed > 0 ? `, ${failed} gagal` : ''}</p>`;
-  if(errors.length > 0) {
-    resultHtml += `<ul class="text-red-700 text-xs space-y-0.5 mt-2">`;
-    errors.slice(0,5).forEach(e => resultHtml += `<li>• ${e}</li>`);
-    if(errors.length > 5) resultHtml += `<li>• ... dan ${errors.length-5} error lainnya</li>`;
-    resultHtml += '</ul>';
-  }
-  resultHtml += '</div>';
-  document.getElementById('import-result').innerHTML = resultHtml;
-
-  if(success > 0) toast(`${success} data siswa berhasil diimport`, 'success');
-}
-
-// ==================== DATA TABLE ====================
-function renderDataTable() {
-  const data = getSiswaData();
-  const q = (document.getElementById('search-siswa').value || '').toLowerCase();
-  const filtered = q ? data.filter(s => s.nama.toLowerCase().includes(q) || s.nisn.includes(q)) : data;
-
-  document.getElementById('data-count').textContent = `${data.length} siswa`;
-
-  const tbody = document.getElementById('data-table-body');
-  if(!filtered.length) {
-    tbody.innerHTML = '<tr><td colspan="9" class="text-center text-stone-400 py-10">Tidak ada data</td></tr>';
-    return;
-  }
-
-  let html = '';
-  filtered.forEach((s, i) => {
-    const r = calcRata(s);
-    const lls = isLulus(s);
-    html += `<tr>
-      <td>${i+1}</td>
-      <td class="font-mono text-xs">${s.nisn}</td>
-      <td class="font-semibold">${s.nama}</td>
-      <td class="text-xs">${s.konsentrasi}</td>
-      <td>${r.ru.toFixed(1)}</td>
-      <td>${r.rk.toFixed(1)}</td>
-      <td class="font-bold">${r.rt.toFixed(2)}</td>
-      <td><span class="grade-badge ${lls ? 'grade-a' : 'grade-d'}">${lls ? 'LULUS' : 'TIDAK LULUS'}</span></td>
-      <td>
-        <div class="flex gap-1">
-          <button onclick='editSiswa("${s.nisn}")' class="p-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition-all" title="Edit">
-            <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
-          </button>
-          <button onclick='printDokumen(getSiswaByNisn("${s.nisn}"))' class="p-1.5 rounded-lg bg-orange-50 text-orange-700 hover:bg-orange-100 transition-all" title="Cetak">
-            <i data-lucide="printer" class="w-3.5 h-3.5"></i>
-          </button>
-          <button onclick='hapusSiswa("${s.nisn}")' class="p-1.5 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 transition-all" title="Hapus">
-            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-          </button>
-        </div>
-      </td>
-    </tr>`;
-  });
-  tbody.innerHTML = html;
-  lucide.createIcons();
-}
-
-function getSiswaByNisn(nisn) {
-  return getSiswaData().find(s => s.nisn === nisn);
-}
-
-function editSiswa(nisn) {
-  const s = getSiswaByNisn(nisn);
-  if(!s) return;
-  document.getElementById('in-nisn').value = s.nisn;
-  document.getElementById('in-nama').value = s.nama;
-  document.getElementById('in-ttl').value = s.tempat_lahir;
-  document.getElementById('in-tgl').value = s.tanggal_lahir;
-  document.getElementById('in-jk').value = s.jk;
-  document.getElementById('in-konsentrasi').value = s.konsentrasi;
-  document.getElementById('in-agama').value = s.nilai_umum.agama;
-  document.getElementById('in-pancasila').value = s.nilai_umum.pancasila;
-  document.getElementById('in-bindo').value = s.nilai_umum.bahasa_indonesia;
-  document.getElementById('in-pjok').value = s.nilai_umum.pjok;
-  document.getElementById('in-sejarah').value = s.nilai_umum.sejarah;
-  document.getElementById('in-seni').value = s.nilai_umum.seni_budaya;
-  document.getElementById('in-mtk').value = s.nilai_kejuruan.matematika;
-  document.getElementById('in-bing').value = s.nilai_kejuruan.bahasa_inggris;
-  document.getElementById('in-info').value = s.nilai_kejuruan.informatika;
-  document.getElementById('in-ipas').value = s.nilai_kejuruan.ipas;
-  document.getElementById('in-dasar').value = s.nilai_kejuruan.dasar;
-  document.getElementById('in-konsnilai').value = s.nilai_kejuruan.konsentrasi;
-  document.getElementById('in-projek').value = s.nilai_kejuruan.projek;
-  document.getElementById('in-pkl').value = s.nilai_kejuruan.pkl;
-  document.getElementById('in-pilihan').value = s.nilai_kejuruan.pilihan;
-  adminNav('input');
-  toast('Data dimuat untuk diedit', 'info');
-}
-
-function hapusSiswa(nisn) {
-  const data = getSiswaData().filter(s => s.nisn !== nisn);
-  setSiswaData(data);
-  renderDataTable();
-  toast('Data siswa dihapus', 'success');
-}
-
-// Delete all with inline confirm
-function confirm2Delete() {
-  document.getElementById('delete-confirm-overlay').classList.remove('hidden');
-  return false; // prevent direct call
-}
-function closeDeleteConfirm() {
-  document.getElementById('delete-confirm-overlay').classList.add('hidden');
-}
-function confirmDeleteAll() {
-  setSiswaData([]);
-  renderDataTable();
-  closeDeleteConfirm();
-  toast('Semua data siswa telah dihapus', 'success');
-}
-
-function hapusSemuaData() {
-  // Called after confirm
-}
-
-// ==================== PRINT DOCUMENT ====================
-function printDokumen(siswa) {
-  if(!siswa) { toast('Data siswa tidak ditemukan', 'error'); return; }
-
-  const r = calcRata(siswa);
-  const lls = isLulus(siswa);
-  const s = getSettings();
-  const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-  const now = new Date();
-  let tglCetak;
-  if(s.tanggal) {
-    const d = new Date(s.tanggal);
-    tglCetak = `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
-  } else {
-    tglCetak = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
-  }
-
-  const logoNTT = 'https://res.cloudinary.com/da9tfnuf8/image/upload/v1771378306/Pemprov_NTT_ufw4i7.png';
-  const logoSMK = 'https://res.cloudinary.com/da9tfnuf8/image/upload/v1771378298/SMKN_4_Kupang_osklge.png';
-
-  const nilaiUmumRows = [
-    ['Pendidikan Agama dan Budi Pekerti', siswa.nilai_umum.agama],
-    ['Pendidikan Pancasila', siswa.nilai_umum.pancasila],
-    ['Bahasa Indonesia', siswa.nilai_umum.bahasa_indonesia],
-    ['Pendidikan Jasmani, Olahraga dan Kesehatan', siswa.nilai_umum.pjok],
-    ['Sejarah', siswa.nilai_umum.sejarah],
-    ['Seni Budaya', siswa.nilai_umum.seni_budaya],
-  ];
-  const nilaiKejRows = [
-    ['Matematika', siswa.nilai_kejuruan.matematika],
-    ['Bahasa Inggris', siswa.nilai_kejuruan.bahasa_inggris],
-    ['Informatika', siswa.nilai_kejuruan.informatika],
-    ['Proyek Ilmu Pengetahuan Alam dan Sosial', siswa.nilai_kejuruan.ipas],
-    ['Dasar-dasar Program Keahlian', siswa.nilai_kejuruan.dasar],
-    ['Mata Pelajaran Konsentrasi Keahlian', siswa.nilai_kejuruan.konsentrasi],
-    ['Proyek Kreatif dan Kewirausahaan', siswa.nilai_kejuruan.projek],
-    ['Praktek Kerja Lapangan', siswa.nilai_kejuruan.pkl],
-    ['Mata Pelajaran Pilihan', siswa.nilai_kejuruan.pilihan],
-  ];
-
-  const rowsUmum = nilaiUmumRows.map(([n, v], i) =>
-    `<tr style="background:${i%2?'#fff9f7':'#fff'}"><td style="padding:8px 4px;border:1px solid #c9a98a;font-size:9px;text-align:center;font-weight:600">${String.fromCharCode(65+i)}</td><td style="padding:8px 4px;border:1px solid #c9a98a;font-size:13px">${n}</td><td style="padding:8px 4px;border:1px solid #c9a98a;text-align:center;font-weight:700;font-size:13px">${v.toFixed(2)}</td><td style="padding:8px 4px;border:1px solid #c9a98a;text-align:center;font-size:12px">${v>=90?'A':v>=80?'B':v>=70?'C':v>=60?'D':'E'}</td></tr>`
-  ).join('');
-
-  const rowsKej = nilaiKejRows.map(([n, v], i) =>
-    `<tr style="background:${i%2?'#fff9f7':'#fff'}"><td style="padding:8px 4px;border:1px solid #c9a98a;font-size:9px;text-align:center;font-weight:600">${String.fromCharCode(65+i)}</td><td style="padding:8px 4px;border:1px solid #c9a98a;font-size:13px">${n}</td><td style="padding:8px 4px;border:1px solid #c9a98a;text-align:center;font-weight:700;font-size:13px">${v.toFixed(2)}</td><td style="padding:8px 4px;border:1px solid #c9a98a;text-align:center;font-size:12px">${v>=90?'A':v>=80?'B':v>=70?'C':v>=60?'D':'E'}</td></tr>`
-  ).join('');
-
-  const htmlContent = `
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SKL - ${siswa.nama}</title>
-  <style>
-    @page { size: A4; margin: 0; }
-    body { margin: 0; padding: 0; font-family: Georgia, serif; }
-    .print-area { width: 210mm; height: 297mm; padding: 0; margin: 0; background: white; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Kelulusan SMKN 4 Kupang</title>
+    <script src="https://tailwindcss.com"></script>
+    <style>
+        @import url('https://googleapis.com');
+        body { font-family: 'Inter', sans-serif; background-color: #fef2e8; }
+        .bg-maroon { background-color: #7c2d12; }
+        .text-maroon { color: #7c2d12; }
+        .hidden { display: none; }
+        @media print { 
+            body { background: white; padding: 0; }
+            .no-print { display: none !important; } 
+            #print-area { display: block !important; width: 100%; } 
+        }
+    </style>
 </head>
-<body onload="window.print();">
-  <div class="print-area" style="border: 3px double #7c2d12; padding: 8mm; display: flex; flex-direction: column; color: #1a1a1a; font-size: 9px;">
-    <!-- Header -->
-    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
-      <img src="${logoNTT}" alt="Logo Pemprov NTT" style="width: 50px; height: 50px; object-fit: contain;" onerror="this.style.display='none'"/>
-      <div style="flex: 1; text-align: center;">
-        <p style="line-height: 1.2; margin: 0.5px 0; font-size: 11px; font-weight: 600; color: #333;">PEMERINTAH PROVINSI NUSA TENGGARA TIMUR</p>
-        <p style="line-height: 1.2; margin: 0.5px 0; font-size: 11px; font-weight: 600; color: #333;">DINAS PENDIDIKAN DAN KEBUDAYAAN</p>
-        <p style="line-height: 1.2; margin: 0.5px 0; font-size: 14px; font-weight: 900; color: #7c2d12; letter-spacing: 0.3px;">SMK NEGERI 4 KUPANG</p>
-        <p style="line-height: 1.2; margin: 0.5px 0; font-size: 10px; color: #666;">Jl. Bajawa - Oepoi, Kupang — NTT 85111 | Email: smknegeri4kpg@gmail.com</p>
-      </div>
-      <img src="${logoSMK}" alt="Logo SMKN 4 Kupang" style="width: 50px; height: 50px; object-fit: contain;" onerror="this.style.display='none'"/>
-    </div>
-    <hr style="border: none; border-top: 1.5px solid #7c2d12; margin: 3px 0;"/>
-    <hr style="border: none; border-top: 0.5px solid #7c2d12; margin: 1px 0;"/>
-    
+<body class="min-h-screen flex items-center justify-center p-4">
 
-
-    <div style="flex: 1; overflow-y: auto;">
-      <!-- SURAT KETERANGAN LULUS -->
-      <div style="text-align: center; margin: 4px 0 2px 0;">
-        <h2 style="font-size: 14px; font-weight: 900; letter-spacing: 0.3px; text-decoration: underline; margin: 0;">SURAT KETERANGAN LULUS</h2>
-      </div>
-      <div style="text-align: center; font-size: 11px; color: #555; margin-bottom: 3px;">Nomor: ${s.nomorsurat || '420/SKL/SMKN4KPG/' + now.getFullYear()}</div>
-
-      <p style="margin-bottom:3px;font-size:11px">Yang bertanda tangan di bawah ini, Kepala SMK Negeri 4 Kupang, menerangkan bahwa:</p>
-      <table style="width: 100%; font-size: 11px; margin: 2px 0; border-collapse: collapse; line-height: 1.4;">
-        <tr><td style="width:28%; padding: 2px 0; vertical-align: top;">Nama Lengkap</td><td style="width:2%; padding: 2px 0; vertical-align: top;">:</td><td style="padding: 2px 0; vertical-align: top;"><strong>${siswa.nama}</strong></td></tr>
-        <tr><td style="padding: 2px 0; vertical-align: top;">NISN</td><td style="padding: 2px 0; vertical-align: top;">:</td><td style="padding: 2px 0; vertical-align: top;">${siswa.nisn}</td></tr>
-        <tr><td style="padding: 2px 0; vertical-align: top;">Jenis Kelamin</td><td style="padding: 2px 0; vertical-align: top;">:</td><td style="padding: 2px 0; vertical-align: top;">${siswa.jk}</td></tr>
-        <tr><td style="padding: 2px 0; vertical-align: top;">Tempat, Tanggal Lahir</td><td style="padding: 2px 0; vertical-align: top;">:</td><td style="padding: 2px 0; vertical-align: top;">${siswa.tempat_lahir}, ${formatTgl(siswa.tanggal_lahir)}</td></tr>
-        <tr><td style="padding: 2px 0; vertical-align: top;">Konsentrasi Keahlian</td><td style="padding: 2px 0; vertical-align: top;">:</td><td style="padding: 2px 0; vertical-align: top;">${siswa.konsentrasi}</td></tr>
-        <tr><td style="padding: 2px 0; vertical-align: top;">Nilai Rata-Rata</td><td style="padding: 2px 0; vertical-align: top;">:</td><td style="padding: 2px 0; vertical-align: top;"><strong>${r.rt.toFixed(2)}</strong></td></tr>
-        <tr><td style="padding: 2px 0; vertical-align: top;">Tahun Pelajaran</td><td style="padding: 2px 0; vertical-align: top;">:</td><td style="padding: 2px 0; vertical-align: top;">${s.tahun || defaultConfig.academic_year}</td></tr>
-      </table>
-
-      <p style="margin: 3px 0; text-align: justify; font-size: 11px; line-height: 1.4;">Dengan ini dinyatakan bahwa peserta didik tersebut telah <strong>${lls ? 'LULUS' : 'TIDAK LULUS'}</strong> dari program pendidikan pada Sekolah Menengah Kejuruan Negeri 4 Kupang setelah mengikuti seluruh rangkaian pembelajaran dan ujian akhir sesuai kurikulum yang berlaku. Peserta didik telah memenuhi semua standar kompetensi yang ditetapkan.</p>
-
-      <!-- NILAI UMUM -->
-      <div style="font-size: 10px; font-weight: 800; color: white; background: #7c2d12; padding: 3px 6px; margin: 3px 0 2px 0;">A. NILAI KELOMPOK UMUM</div>
-      <table style="width: 100%; border-collapse: collapse; font-size: 9px; margin: 1px 0;">
-        <thead><tr><th style="width:5%; background: #c2410c; color: white; padding: 3px 4px; text-align: center; border: 0.5px solid #c9a98a; font-weight: 700;">No</th><th style="width:60%; background: #c2410c; color: white; padding: 3px 4px; text-align: left; border: 0.5px solid #c9a98a; font-weight: 700;">Mata Pelajaran</th><th style="width:18%; background: #c2410c; color: white; padding: 3px 4px; text-align: center; border: 0.5px solid #c9a98a; font-weight: 700;">Nilai</th><th style="width:17%; background: #c2410c; color: white; padding: 3px 4px; text-align: center; border: 0.5px solid #c9a98a; font-weight: 700;">Predikat</th></tr></thead>
-        <tbody>
-          ${nilaiUmumRows.map(([n, v], i) =>
-            `<tr style="background:${i%2?'#fff9f7':'#fff'}"><td style="padding:8px 4px;border:1px solid #c9a98a;font-size:9px;text-align:center;font-weight:600">${i+1}</td><td style="padding:8px 4px;border:1px solid #c9a98a;font-size:9px">${n}</td><td style="padding:8px 4px;border:1px solid #c9a98a;text-align:center;font-weight:700;font-size:9px">${v.toFixed(2)}</td><td style="padding:8px 4px;border:1px solid #c9a98a;text-align:center;font-size:8px">${v>=90?'A':v>=80?'B':v>=70?'C':v>=60?'D':'E'}</td></tr>`
-          ).join('')}
-          <tr style="background: #fef2e8; font-weight: 700; color: #7c2d12; padding: 3px 4px; font-size: 9px;"><td style="border: 0.5px solid #c9a98a; padding: 2px 4px; text-align:center;font-weight:600">—</td><td style="border: 0.5px solid #c9a98a; padding: 2px 4px;">Rata-Rata Umum</td><td style="border: 0.5px solid #c9a98a; padding: 2px 4px; text-align:center;font-size:9px">${r.ru.toFixed(2)}</td><td style="border: 0.5px solid #c9a98a; padding: 2px 4px; text-align:center">${r.ru>=90?'A':r.ru>=80?'B':r.ru>=70?'C':r.ru>=60?'D':'E'}</td></tr>
-        </tbody>
-      </table>
-
-      <!-- NILAI KEJURUAN -->
-      <div style="font-size: 10px; font-weight: 800; color: white; background: #7c2d12; padding: 3px 6px; margin: 3px 0 2px 0;">B. NILAI KELOMPOK KEJURUAN</div>
-      <table style="width: 100%; border-collapse: collapse; font-size: 9px; margin: 1px 0;">
-        <thead><tr><th style="width:5%; background: #c2410c; color: white; padding: 3px 4px; text-align: center; border: 0.5px solid #c9a98a; font-weight: 700;">No</th><th style="width:60%; background: #c2410c; color: white; padding: 3px 4px; text-align: left; border: 0.5px solid #c9a98a; font-weight: 700;">Mata Pelajaran</th><th style="width:18%; background: #c2410c; color: white; padding: 3px 4px; text-align: center; border: 0.5px solid #c9a98a; font-weight: 700;">Nilai</th><th style="width:17%; background: #c2410c; color: white; padding: 3px 4px; text-align: center; border: 0.5px solid #c9a98a; font-weight: 700;">Predikat</th></tr></thead>
-        <tbody>
-          ${nilaiKejRows.map(([n, v], i) =>
-            `<tr style="background:${i%2?'#fff9f7':'#fff'}"><td style="padding:8px 4px;border:1px solid #c9a98a;font-size:9px;text-align:center;font-weight:600">${i+1}</td><td style="padding:8px 4px;border:1px solid #c9a98a;font-size:9px">${n}</td><td style="padding:8px 4px;border:1px solid #c9a98a;text-align:center;font-weight:700;font-size:9px">${v.toFixed(2)}</td><td style="padding:8px 4px;border:1px solid #c9a98a;text-align:center;font-size:8px">${v>=90?'A':v>=80?'B':v>=70?'C':v>=60?'D':'E'}</td></tr>`
-          ).join('')}
-          <tr style="background: #fef2e8; font-weight: 700; color: #7c2d12; padding: 3px 4px; font-size: 9px;"><td style="border: 0.5px solid #c9a98a; padding: 2px 4px; text-align:center;font-weight:600">—</td><td style="border: 0.5px solid #c9a98a; padding: 2px 4px;">Rata-Rata Kejuruan</td><td style="border: 0.5px solid #c9a98a; padding: 2px 4px; text-align:center;font-size:9px">${r.rk.toFixed(2)}</td><td style="border: 0.5px solid #c9a98a; padding: 2px 4px; text-align:center">${r.rk>=90?'A':r.rk>=80?'B':r.rk>=70?'C':r.rk>=60?'D':'E'}</td></tr>
-        </tbody>
-      </table>
-
-      <!-- GRAND TOTAL -->
-      <div style="text-align: center; margin: 3px 0; padding: 5px; border: 2px double #7c2d12; background: #fef2e8;">
-        <p style="font-size: 8px; font-weight: 600; color: #7c2d12; margin-bottom: 1px;">NILAI RATA-RATA AKHIR</p>
-        <p style="font-size: 16px; font-weight: 900; color: #7c2d12; line-height: 1;">${r.rt.toFixed(2)}</p>
-        <p style="font-size: 8px; font-weight: 700; margin-top: 1px;"><strong style="color:${lls?'#166534':'#991b1b'}">${lls?'✓ LULUS':'✗ TIDAK LULUS'}</strong></p>
-      </div>
-
-      <!-- STATEMENT -->
-      <p style="margin:4px 0;text-align:left;font-size:11px;font-style:italic;line-height:1.3">Demikian surat keterangan ini dibuat untuk dipergunakan sebagaimana mestinya.</p>
+    <!-- 1. HALAMAN LOGIN -->
+    <div id="screen-login" class="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden no-print">
+        <div class="bg-maroon p-8 text-center text-white">
+            <div class="flex justify-center gap-4 mb-4">
+                <img src="https://cloudinary.com" class="h-16">
+                <img src="https://cloudinary.com" class="h-16">
+            </div>
+            <h1 class="text-xl font-bold">SMKN 4 KUPANG</h1>
+            <p class="text-sm opacity-80">Sistem Informasi Kelulusan 2025/2026</p>
+        </div>
+        <div class="p-8">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Masukkan NISN Siswa</label>
+            <input id="input-nisn" type="text" placeholder="Contoh: 0077694732" class="w-full border border-gray-300 rounded-xl px-4 py-3 mb-4 focus:ring-2 focus:ring-orange-500 outline-none">
+            <button onclick="prosesLogin()" class="w-full bg-maroon text-white font-bold py-3 rounded-xl hover:bg-red-900 transition shadow-lg">Cek Kelulusan</button>
+            <p id="error-msg" class="text-red-600 text-sm mt-3 text-center hidden font-semibold"></p>
+        </div>
     </div>
 
-    <!-- SIGNATURE -->
-    <div style="display: flex; justify-content: flex-end; padding-top: 6px; margin-top: 4px;">
-      <div style="text-align: center;">
-        <p style="font-size:12px;margin:0 0 2px 0">${s.kota || 'Kupang'}, ${tglCetak}</p>
-        <p style="font-weight:700;margin:3px 0;font-size:12px">Kepala Sekolah,</p>
-        <div style="height: 24px; margin: 4px 0;"></div>
-        <p style="font-weight:900;text-decoration:underline;font-size:12px;margin:2px 0 0 0;line-height:1.2">${s.kepsek || defaultConfig.principal_name}</p>
-        <p style="font-size:11px;margin:1px 0">NIP. ${s.nip || defaultConfig.principal_nip}</p>
-      </div>
+    <!-- 2. HALAMAN KARTU KELULUSAN (Sesuai Gambar Anda) -->
+    <div id="screen-result" class="w-full max-w-2xl hidden no-print">
+        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+            <div id="status-box" class="bg-red-700 p-8 text-white relative">
+                <p class="text-xs uppercase tracking-widest font-bold opacity-80">Status Kelulusan</p>
+                <h2 id="v-status" class="text-5xl font-black mt-1">LULUS</h2>
+                <p class="mt-2 opacity-80">Tahun Pelajaran 2025/2026</p>
+                <div class="absolute right-8 top-8 bg-white/20 p-4 rounded-full">
+                    <svg xmlns="http://w3.org" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                </div>
+            </div>
+            <div class="p-8 grid grid-cols-2 gap-6 bg-white border-b">
+                <div><p class="text-[10px] text-gray-400 uppercase">Nama Lengkap</p><p id="v-nama" class="font-bold text-gray-800 text-lg">-</p></div>
+                <div><p class="text-[10px] text-gray-400 uppercase">NISN</p><p id="v-nisn" class="font-bold text-gray-800 text-lg">-</p></div>
+                <div><p class="text-[10px] text-gray-400 uppercase">Tempat, Tanggal Lahir</p><p id="v-ttl" class="font-bold text-gray-800">-</p></div>
+                <div><p class="text-[10px] text-gray-400 uppercase">Konsentrasi Keahlian</p><p id="v-jurusan" class="font-bold text-gray-800">-</p></div>
+            </div>
+            <div class="p-8 flex gap-4 bg-gray-50">
+                <div class="flex-1 text-center"><p class="text-[10px] text-gray-400">Rata Umum</p><p id="v-rata-umum" class="text-2xl font-bold">0</p></div>
+                <div class="flex-1 text-center border-x"><p class="text-[10px] text-orange-500 font-bold">Rata-Rata Total</p><p id="v-rata-total" class="text-3xl font-black text-orange-700">0</p></div>
+                <div class="flex-1 text-center"><p class="text-[10px] text-gray-400">Rata Kejuruan</p><p id="v-rata-jurusan" class="text-2xl font-bold">0</p></div>
+            </div>
+            <div class="p-8">
+                <button onclick="window.print()" class="w-full bg-red-700 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 hover:bg-black shadow-xl">
+                    <svg xmlns="http://w3.org" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                    Cetak Surat Keterangan Lulus & Transkrip Nilai
+                </button>
+                <button onclick="location.reload()" class="w-full text-gray-400 text-sm mt-4 hover:underline">Kembali</button>
+            </div>
+        </div>
     </div>
 
-    <!-- FOOTER NOTES -->
-    <div style="margin-top: 6px; padding-top: 4px; border-top: 0.5px solid #ccc; display: flex; justify-content: space-between; align-items: flex-start;">
-      <div style="font-size: 8px; color: #666; line-height: 1.2;">
-        <p style="margin: 0; font-size: 7px;">*) Dokumen ini perlu ditandatangani dan diberi cap/stempel basah.</p>
-        <p style="margin: 2px 0 0 0; font-size: 7px; color: #999;">Dicetak: ${now.getDate().toString().padStart(2,'0')}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getFullYear()} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}</p>
-      </div>
+    <!-- 3. AREA CETAK (SKL RESMI) -->
+    <div id="print-area" class="hidden bg-white text-black p-10 text-[12px] leading-relaxed">
+        <div class="flex items-center border-b-4 border-black pb-2 mb-4 text-center">
+            <img src="https://cloudinary.com" class="h-20 absolute">
+            <div class="w-full">
+                <h2 class="text-lg font-bold">PEMERINTAH PROVINSI NUSA TENGGARA TIMUR</h2>
+                <h2 class="text-lg font-bold">DINAS PENDIDIKAN DAN KEBUDAYAAN</h2>
+                <h1 class="text-xl font-black">SMK NEGERI 4 KUPANG</h1>
+                <p>Jl. Bajawa - Oepoi, Kupang — NTT 85111 | Email: smknegeri4kpg@gmail.com</p>
+            </div>
+        </div>
+        
+        <h3 class="text-center font-bold underline text-sm">SURAT KETERANGAN LULUS</h3>
+        <p class="text-center mb-4 text-[10px]">Nomor: Pend.009/SMKN4/187/2026</p>
+
+        <p class="mb-4">Kepala SMK Negeri 4 Kupang, menerangkan bahwa:</p>
+        <table class="mb-4">
+            <tr><td class="w-40">Nama Lengkap</td><td>: <span id="p-nama" class="font-bold"></span></td></tr>
+            <tr><td>NISN</td><td>: <span id="p-nisn" class="font-bold"></span></td></tr>
+            <tr><td>TTL</td><td>: <span id="p-ttl"></span></td></tr>
+            <tr><td>Keahlian</td><td>: <span id="p-jurusan"></span></td></tr>
+        </table>
+
+        <p class="mb-4">Dinyatakan telah <span class="font-bold">LULUS</span> dari program pendidikan SMKN 4 Kupang.</p>
+
+        <p class="font-bold mb-1">A. NILAI KELOMPOK UMUM</p>
+        <table class="w-full border-collapse border border-black mb-4 text-center">
+            <tr class="font-bold bg-gray-100">
+                <td class="border border-black p-1 w-8">No</td><td class="border border-black p-1 text-left">Mata Pelajaran</td><td class="border border-black p-1">Nilai</td>
+            </tr>
+            <tr><td class="border border-black">1</td><td class="border border-black text-left p-1">Pend. Agama & Budi Pekerti</td><td id="p-agama" class="border border-black"></td></tr>
+            <tr><td class="border border-black">2</td><td class="border border-black text-left p-1">Pend. Pancasila</td><td id="p-pancasila" class="border border-black"></td></tr>
+            <tr><td class="border border-black">3</td><td class="border border-black text-left p-1">Bahasa Indonesia</td><td id="p-indo" class="border border-black"></td></tr>
+            <tr><td class="border border-black">4</td><td class="border border-black text-left p-1">PJOK</td><td id="p-pjok" class="border border-black"></td></tr>
+            <tr><td class="border border-black">5</td><td class="border border-black text-left p-1">Sejarah</td><td id="p-sejarah" class="border border-black"></td></tr>
+            <tr><td class="border border-black">6</td><td class="border border-black text-left p-1">Seni Budaya</td><td id="p-seni" class="border border-black"></td></tr>
+            <tr class="font-bold bg-gray-50"><td colspan="2" class="border border-black text-right p-1 italic">Rata-Rata Umum</td><td id="p-rata-umum" class="border border-black"></td></tr>
+        </table>
+
+        <p class="font-bold mb-1">B. NILAI KELOMPOK KEJURUAN</p>
+        <table class="w-full border-collapse border border-black mb-4 text-center text-[11px]">
+            <tr class="font-bold bg-gray-100">
+                <td class="border border-black p-1 w-8">No</td><td class="border border-black p-1 text-left">Mata Pelajaran</td><td class="border border-black p-1">Nilai</td>
+            </tr>
+            <tr><td class="border border-black">1</td><td class="border border-black text-left p-1">Matematika</td><td id="p-mtk" class="border border-black"></td></tr>
+            <tr><td class="border border-black">2</td><td class="border border-black text-left p-1">Bahasa Inggris</td><td id="p-inggris" class="border border-black"></td></tr>
+            <tr><td class="border border-black">3</td><td class="border border-black text-left p-1">Informatika</td><td id="p-info" class="border border-black"></td></tr>
+            <tr><td class="border border-black">4</td><td class="border border-black text-left p-1">Proyek IPAS</td><td id="p-ipas" class="border border-black"></td></tr>
+            <tr><td class="border border-black">5</td><td class="border border-black text-left p-1">Dasar-dasar Kejuruan</td><td id="p-dasar" class="border border-black"></td></tr>
+            <tr><td class="border border-black">6</td><td class="border border-black text-left p-1">Mapel Konsentrasi Keahlian</td><td id="p-konsen" class="border border-black"></td></tr>
+            <tr><td class="border border-black">7</td><td class="border border-black text-left p-1">Proyek Kreatif & Kewirausahaan</td><td id="p-kreatif" class="border border-black"></td></tr>
+            <tr><td class="border border-black">8</td><td class="border border-black text-left p-1">Praktek Kerja Lapangan (PKL)</td><td id="p-pkl" class="border border-black"></td></tr>
+            <tr><td class="border border-black">9</td><td class="border border-black text-left p-1">Mata Pelajaran Pilihan</td><td id="p-pilihan" class="border border-black"></td></tr>
+            <tr class="font-bold bg-gray-50"><td colspan="2" class="border border-black text-right p-1 italic">Rata-Rata Kejuruan</td><td id="p-rata-jurusan" class="border border-black"></td></tr>
+            <tr class="font-bold text-lg"><td colspan="2" class="border border-black text-right p-1">NILAI RATA-RATA AKHIR</td><td id="p-rata-total" class="border border-black p-2"></td></tr>
+        </table>
+
+        <div class="mt-8 float-right text-center w-72">
+            <p>Kupang, 4 Mei 2026</p>
+            <p class="font-bold mb-20">Kepala Sekolah,</p>
+            <p class="font-bold underline text-sm">Semi Ndolu, S.Pd., M.Pd.</p>
+            <p>NIP. 19801114 200312 1 002</p>
+        </div>
     </div>
-  </div>
+
+    <script>
+        const API_URL = "https://sheetbest.com";
+
+        async function prosesLogin() {
+            const input = document.getElementById('input-nisn').value.trim();
+            const errorMsg = document.getElementById('error-msg');
+            if(!input) { alert("Masukkan NISN!"); return; }
+            
+            errorMsg.innerText = "Mencari data...";
+            errorMsg.classList.remove('hidden');
+
+            try {
+                const res = await fetch(API_URL);
+                const data = await res.json();
+                const s = data.find(item => String(item.nisn).trim() === input);
+
+                if(s) {
+                    // Isi Kartu Hasil
+                    document.getElementById('v-nama').innerText = s.nama;
+                    document.getElementById('v-nisn').innerText = s.nisn;
+                    document.getElementById('v-ttl').innerText = s.ttl;
+                    document.getElementById('v-jurusan').innerText = s.konsentrasi;
+                    document.getElementById('v-rata-umum').innerText = s.rata_umum;
+                    document.getElementById('v-rata-total').innerText = s.rata_akhir;
+                    document.getElementById('v-rata-jurusan').innerText = s.rata_kejuruan;
+
+                    // Isi ke SKL (Cetak)
+                    document.getElementById('p-nama').innerText = s.nama;
+                    document.getElementById('p-nisn').innerText = s.nisn;
+                    document.getElementById('p-ttl').innerText = s.ttl;
+                    document.getElementById('p-jurusan').innerText = s.konsentrasi;
+                    
+                    // Isi Nilai Umum
+                    document.getElementById('p-agama').innerText = s.n_agama;
+                    document.getElementById('p-pancasila').innerText = s.n_pancasila;
+                    document.getElementById('p-indo').innerText = s.n_indo;
+                    document.getElementById('p-pjok').innerText = s.n_pjok;
+                    document.getElementById('p-sejarah').innerText = s.n_sejarah;
+                    document.getElementById('p-seni').innerText = s.n_seni;
+                    document.getElementById('p-rata-umum').innerText = s.rata_umum;
+
+                    // Isi Nilai Kejuruan
+                    document.getElementById('p-mtk').innerText = s.n_mtk;
+                    document.getElementById('p-inggris').innerText = s.n_inggris;
+                    document.getElementById('p-info').innerText = s.n_info;
+                    document.getElementById('p-ipas').innerText = s.n_ipas;
+                    document.getElementById('p-dasar').innerText = s.n_dasar;
+                    document.getElementById('p-konsen').innerText = s.n_konsentrasi;
+                    document.getElementById('p-kreatif').innerText = s.n_kreatif;
+                    document.getElementById('p-pkl').innerText = s.n_pkl;
+                    document.getElementById('p-pilihan').innerText = s.n_pilihan;
+                    document.getElementById('p-rata-jurusan').innerText = s.rata_kejuruan;
+                    document.getElementById('p-rata-total').innerText = s.rata_akhir;
+
+                    document.getElementById('screen-login').classList.add('hidden');
+                    document.getElementById('screen-result').classList.remove('hidden');
+                } else {
+                    errorMsg.innerText = "NISN tidak terdaftar!";
+                }
+            } catch (err) { alert("Error koneksi!"); }
+        }
+    </script>
 </body>
-</html>
-  `;
-
-  const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  window.open(url, '_blank');
-  toast(`Dokumen ${siswa.nama} dibuka di tab baru`, 'success');
-}
-
-// ==================== UTILS ====================
-function formatTgl(tgl) {
-  if(!tgl) return '—';
-  const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-  try {
-    const d = new Date(tgl);
-    if(isNaN(d)) return tgl;
-    return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
-  } catch(e) { return tgl; }
-}
-
-function toast(msg, type='info') {
-  const el = document.createElement('div');
-  el.className = `toast toast-${type}`;
-  el.textContent = msg;
-  document.getElementById('toast-container').appendChild(el);
-  setTimeout(() => el.remove(), 3500);
-}
-
-// Enter key support for login
-document.addEventListener('keydown', e => {
-  if(e.key === 'Enter') {
-    const adminVisible = !document.getElementById('login-admin').classList.contains('hidden');
-    const siswaVisible = !document.getElementById('login-siswa').classList.contains('hidden');
-    if(adminVisible && document.getElementById('screen-login').style.display !== 'none' && !document.getElementById('screen-login').classList.contains('hidden')) loginAdmin();
-    if(siswaVisible && !document.getElementById('screen-login').classList.contains('hidden')) loginSiswa();
-  }
-});
-</script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e545434c0204dae',t:'MTc3NTAxMjI3My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
