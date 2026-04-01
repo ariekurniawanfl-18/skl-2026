@@ -112,14 +112,15 @@
     <script>
         async function prosesLogin() {
             const nisn = document.getElementById('input-nisn').value.trim();
-            const url = "https://google.com";
+            const pesan = document.getElementById('pesan');
             const btn = document.getElementById('btn-text');
-            const err = document.getElementById('pesan-err');
 
-            if(!nisn) return alert("Isi NISN!");
-            
-            btn.innerText = "Mencari data...";
-            err.style.display = "none";
+            // --- MASUKKAN LINK GOOGLE APPS SCRIPT ANDA DI SINI ---
+            const url = "https://script.google.com/macros/s/AKfycbwLBGoBQwx3MUQxaeiUzsxcWsdRi3E8fDexiplHbN4oHud7hHowWWTecbNBVZlTYgzNxg/exec";
+
+            if(!nisn) { alert("Masukkan NISN!"); return; }
+            pesan.innerText = "Mencari data...";
+            pesan.classList.remove('hidden');
 
             try {
                 const res = await fetch(url);
